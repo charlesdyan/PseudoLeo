@@ -1,0 +1,47 @@
+
+
+class DatabaseDAO {
+
+    clustersTable = new Table(
+        _id: AutoInc, //magic database sequence number
+        project: String,
+        clusterName: String,
+        owner: EmailAddress,
+        status: ClusterStatus
+    ).setPrimaryKey(_id)
+     .addIndex(project, clusterName)
+     .addIndex(owner)
+
+    operationsTable = new Table(
+        googleOpId: UUID,
+        clusterId: Int,
+        status: OperationStatus
+    ).setPrimaryKey(googleOpId)
+     .addForeignKey(operationsTable.clusterId references clustersTable._id )
+     .addIndex(clusterId)
+
+    def createCluster(project, clusterName, owner) {
+        clustersTable.addRow(NULL, project, clusterName, owner, ClusterStatus.STARTING)
+    }
+
+    def updateClusterStatus(project, clusterName, newStatus) {
+        clustersTable.query(project, clusterName).update(status = newStatus)
+    }
+
+    def deleteCluster(project, clusterName) {
+        updateStatus(project, clusterName, ClusterStatus.DELETED)
+    }
+
+    def addOperation(project, clusterName, googleOpId) {
+        clusterId = clustersTable.query(project, clusterName)._id
+        operationsTable.addRow(googleOpId, clusterId, PENDING)
+    }
+
+    def updateOperationStatus(googleOpId, newStatus) {
+        operationsTable.query(googleOpId).update(status = newStatus)
+    }
+
+    def deleteOperation(googleOpId) {
+        operationsTable.delete(googleOpId)
+    }
+}

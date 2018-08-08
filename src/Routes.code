@@ -1,0 +1,16 @@
+
+class Routes extends MagicWebserviceLibrary {
+
+    def receive(endpoint: String) {
+        endpoint match {
+            case "PUT clusters/$project/$clusterName" => ClusterService.createCluster(project, clusterName)
+            case "GET clusters/$project/$clusterName" => ClusterService.getClusterDetails(project, clusterName)
+            case "DELETE clusters/$project/$clusterName" => ClusterService.deleteCluster(project, clusterName)
+
+            case "GET clusters" => ClusterService.listClusters()
+
+            case "POST clusters/$project/$clusterName/pause" => ClusterService.pauseCluster(project, clusterName)
+            case "POST clusters/$project/$clusterName/resume" => ClusterService.resumeCluster(project, clusterName)
+        }
+    }
+}

@@ -2,8 +2,8 @@
 
 def main(args: List[String]) {
     routes = new Routes()
-    googleDAO = new GoogleDAO()
-    dbDAO = new DbDAO()
+    googleDAO = new DataProcDAO()
+    dbDAO = new DatabaseDAO()
     clusterService = new ClusterService()
 
     monitor = new Monitor()
