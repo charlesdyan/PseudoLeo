@@ -1,0 +1,13 @@
+
+
+def main(args: List[String]) {
+    routes = new Routes()
+    googleDAO = new GoogleDAO()
+    dbDAO = new DbDAO()
+    clusterService = new ClusterService()
+
+    monitor = new Monitor()
+    monitor.resumeFromStartup()
+
+    routes.listenForever()
+}
