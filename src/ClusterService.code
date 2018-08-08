@@ -1,0 +1,32 @@
+Class ClusterService {
+    def createCluster(user) {
+        opId = DataProcDAO.createCluster()
+        DatabaseDAO.saveCluster(
+            clusterId = None,
+            opId = opId,
+            owner = user
+        )
+        // TODO: start monitor if not global
+        return HTTP 202 Accepted
+    }
+
+    def pauseCluster(user, clusterId) {
+        pendingOperations = DatabaseDAO.selectOperations(clusterId)
+        if (pendingOperations.empty) {
+
+            details = DataProcDAO.getClusterDetails(clusterId)
+            DatabaseDAO.updateCluster(
+                clusterId = clusterId,
+                status = PAUSING
+            )
+            details.instances.map(DataProcDAO.pause(_))
+        }
+        opIds.map(DataProcDAO.getC)
+        details = DataProcDAO.getClusterDetails(clusterId)
+        details.instances.map(DataProcDAO.pause(_))
+    }
+
+    def listClusters(user) {
+        DatabaseDAO.getClusters(user)
+    }
+}
