@@ -24,6 +24,10 @@ class DatabaseDAO {
         clustersTable.addRow(NULL, project, clusterName, owner, ClusterStatus.STARTING)
     }
 
+    def getCluster(project, clusterName): Option[ClusterRow] {
+        clustersTable.query(project.clusterName).selectFirst
+    }
+
     def updateClusterStatus(project, clusterName, newStatus) {
         clustersTable.query(project, clusterName).update(status = newStatus)
     }

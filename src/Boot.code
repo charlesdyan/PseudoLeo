@@ -6,8 +6,7 @@ def main(args: List[String]) {
     dbDAO = new DatabaseDAO()
     clusterService = new ClusterService()
 
-    monitor = new Monitor()
-    monitor.resumeFromStartup()
+    Monitor.resumeFromStartup()
 
     routes.listenForever()
 }
