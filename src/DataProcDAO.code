@@ -1,0 +1,23 @@
+class DataProcDAO {
+
+    def createCluster() {
+        googleDataProcLibrary.createCluster()
+    }
+
+    def getClusterDetails(clusterId) {
+        googleDataProcLibrary.getClusterDetails(clusterId)
+    }
+
+    def pause(instanceId) {
+        googleComputeEngineLibrary.pauseInstance(instanceId)
+    }
+
+    def resume(instanceId) {
+        googleComputeEngineLibrary.resumeInstance(instanceId)
+    }
+
+    def pollOperation(opid) {
+        googleOperations.poll(opid)
+    }
+
+}

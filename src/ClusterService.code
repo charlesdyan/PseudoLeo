@@ -6,24 +6,26 @@ Class ClusterService {
             opId = opId,
             owner = user
         )
-        // TODO: start monitor if not global
+        new Monitor()
         return HTTP 202 Accepted
     }
 
     def pauseCluster(user, clusterId) {
-        pendingOperations = DatabaseDAO.selectOperations(clusterId)
-        if (pendingOperations.empty) {
+        clusterRow = DatabaseDAO.getCluster(clusterId)
 
-            details = DataProcDAO.getClusterDetails(clusterId)
-            DatabaseDAO.updateCluster(
-                clusterId = clusterId,
-                status = PAUSING
-            )
-            details.instances.map(DataProcDAO.pause(_))
+        if( clusterRow == None ) {
+            return HTTP 404
+        } else if (clusterRow.status = ClusterStatus.RUNNING ) {
+            return HTTP 400 //can't pause something not-up
         }
-        opIds.map(DataProcDAO.getC)
+
+        //else: exists and is running
+
         details = DataProcDAO.getClusterDetails(clusterId)
-        details.instances.map(DataProcDAO.pause(_))
+        DatabaseDAO.updateCluster(clusterId, PAUSING)
+        operations = details.instances.map(DataProcDAO.pause(_))
+
+        operations.map( op => DatabaseDAO.addOperation(clusterId, op) )
     }
 
     def listClusters(user) {
