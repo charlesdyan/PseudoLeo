@@ -1,0 +1,28 @@
+class Monitor(clusterId) {
+    def work() {
+
+
+    
+        pollResult = googleDAO.poll(opid)
+        pollResult.status match {
+            case STARTING => //do nothing
+            case SUCCESS =>
+        db.updateStatus(opid, SUCCESS);
+        db.updateClusterId(opid, pollResult.clusterId);
+        case FAIL =>
+            db.updateStatus(opid, FAIL);
+        }
+
+    }
+}
+
+object Monitor {
+    def resumeFromStartup() {
+        pendingClusterRows = dbDAO.clustersTable.allPending()
+        pendingClusterRows.map { 
+            if (dbDAO.operationsTable.exists(_.clusterId)) {
+                new Monitor(clusterId)
+            }
+        }
+    }
+}
