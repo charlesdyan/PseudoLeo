@@ -10,7 +10,7 @@ class Monitor(clusterId, status) {
         opids = db.query( select opid from OPERATIONS where cid = clusterid )
         if( opids.length == 0 ):
             status match {
-                case RESUMING => updateClusterIP()
+                case RESUMING | STARTING => updateClusterIP()
             }
             db.updateCluster(clusterid, status = getNext(status) )
             monitor.die()
