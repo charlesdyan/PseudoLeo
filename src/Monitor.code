@@ -1,28 +1,25 @@
-class Monitor(clusterId) {
+class Monitor(clusterId, status) {
     def work() {
-
-
-    
-        pollResult = googleDAO.poll(opid)
-        pollResult.status match {
-            case STARTING => //do nothing
-            case SUCCESS =>
-        db.updateStatus(opid, SUCCESS);
-        db.updateClusterId(opid, pollResult.clusterId);
-        case FAIL =>
-            db.updateStatus(opid, FAIL);
+        // lets pretend we have some sensible scheduling
+        while (true) {
+            watchCluster(clusterId, clusterStatus)
         }
-
     }
+
+    def watchCluster( clusterid, clusterStatus ):
+        opids = db.query( select opid from OPERATIONS where cid = clusterid )
+        if( opids.length == 0 ):
+            db.updateCluster(clusterid, status = getNext(status) )
+            monitor.die()
+        else:
+            opids.map{ status = google.poll(opid); if(status=DONE) db.remove(opid) }
 }
 
 object Monitor {
     def resumeFromStartup() {
         pendingClusterRows = dbDAO.clustersTable.allPending()
-        pendingClusterRows.map { 
-            if (dbDAO.operationsTable.exists(_.clusterId)) {
-                new Monitor(clusterId)
-            }
+        pendingClusterRows.map { row =>
+            new Monitor(row.clusterId, row.status)
         }
     }
 }
