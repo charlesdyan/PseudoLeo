@@ -9,10 +9,18 @@ class Monitor(clusterId, status) {
     def watchCluster( clusterid, clusterStatus ):
         opids = db.query( select opid from OPERATIONS where cid = clusterid )
         if( opids.length == 0 ):
+            status match {
+                case RESUMING => updateClusterIP()
+            }
             db.updateCluster(clusterid, status = getNext(status) )
             monitor.die()
         else:
             opids.map{ status = google.poll(opid); if(status=DONE) db.remove(opid) }
+
+    def updateClusterIP() {
+        details = DataProcDAO.clusterDetails()
+        dbDAO.updateCluster(clusterId, ip=details.ip)
+    }
 }
 
 object Monitor {

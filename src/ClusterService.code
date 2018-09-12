@@ -15,17 +15,37 @@ Class ClusterService {
 
         if( clusterRow == None ) {
             return HTTP 404
-        } else if (clusterRow.status = ClusterStatus.RUNNING ) {
+        } else if (clusterRow.status != ClusterStatus.RUNNING ) {
             return HTTP 400 //can't pause something not-up
         }
 
         //else: exists and is running
 
         details = DataProcDAO.getClusterDetails(clusterId)
-        DatabaseDAO.updateCluster(clusterId, PAUSING)
+        DatabaseDAO.updateCluster(clusterId, ClusterStatus.PAUSING)
         operations = details.instances.map(DataProcDAO.pause(_))
 
-        operations.map( op => DatabaseDAO.addOperation(clusterId, op) )
+        operations.map( op => DatabaseDAO.addOperation(clusterId, op))
+
+        new Monitor(clusterId, ClusterStatus.PAUSING)
+    }
+
+    def resumeCluster(user, clusterId) {
+        clusterRow = DatabaseDAO.getCluster(clusterId)
+
+        if( clusterRow == None ) {
+            return HTTP 404
+        } else if (clusterRow.status != ClusterStatus.PAUSED) {
+            return HTTP 400 //can't resume if not paused
+        }
+
+        details = DataProcDAO.getClusterDetails(clusterId)
+        DatabaseDAO.updateCluster(clusterId, RESUMING)
+        operations = details.instances.map(DataProcDAO.resume(_))
+
+        operations.map( op => DatabaseDAO.addOperation(clusterId, op))
+
+        new Monitor(clusterId, ClusterStatus.RESUMING)
     }
 
     def listClusters(user) {
